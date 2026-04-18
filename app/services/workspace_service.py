@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import Optional
 from bson import ObjectId
 from app.db.mongodb import get_db
 from app.schemas.workspace import WorkspaceCreate, WorkspaceUpdate, MemberAdd, Role
@@ -106,7 +107,7 @@ async def delete_workspace(workspace_id: str, user_id: str):
     await db.workspaces.delete_one({"_id": ObjectId(workspace_id)})
 
 
-def _get_member(doc: dict, user_id: str) -> dict | None:
+def _get_member(doc: dict, user_id: str) -> Optional[dict]:
     for m in doc.get("members", []):
         if m["user_id"] == user_id:
             return m

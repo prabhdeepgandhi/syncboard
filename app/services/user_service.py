@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import Optional
 from bson import ObjectId
 from app.db.mongodb import get_db
 from app.core.security import hash_password, verify_password, create_access_token
@@ -32,7 +33,7 @@ async def login_user(data: UserLogin) -> dict:
     return {"access_token": token, "token_type": "bearer"}
 
 
-async def get_user_by_id(user_id: str) -> dict | None:
+async def get_user_by_id(user_id: str) -> Optional[dict]:
     db = get_db()
     user = await db.users.find_one({"_id": ObjectId(user_id)})
     if user:
