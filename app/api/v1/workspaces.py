@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from app.core.deps import get_current_user
 from app.schemas.workspace import WorkspaceCreate, WorkspaceUpdate, MemberAdd, WorkspaceOut
-from app.services import workspace_service
+from app.services import workspace_service, outlier_service
 
 router = APIRouter(prefix="/workspaces", tags=["workspaces"])
 
@@ -53,5 +53,14 @@ async def add_member(workspace_id: str, data: MemberAdd, user=Depends(get_curren
 async def delete(workspace_id: str, user=Depends(get_current_user)):
     try:
         await workspace_service.delete_workspace(workspace_id, user["id"])
+    except Exception as e:
+        _handle(e)
+
+
+@router.post("/{workspace_id}/split-overflow")
+async def split_overflow(workspace_id: str, user=Depends(get_current_user)):
+    """Outlier pattern: split oversized workspace into linked shard documents."""
+    try:
+        return await outlier_service.check_and_split_workspace(workspace_id, user["id"])
     except Exception as e:
         _handle(e)
